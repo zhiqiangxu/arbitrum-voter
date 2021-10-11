@@ -43,7 +43,7 @@ Before running, you need feed the configuration file `config.json`.
 Now, you can start voter as follow: 
 
 ```shell
-./arb_voter -config=./config.json 
+./arb_voter -conf config.json 
 ```
 
 It will generate logs under `./Log` and check relayer status by view log file.
