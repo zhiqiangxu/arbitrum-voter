@@ -115,21 +115,19 @@ func (v *Voter) Start(ctx context.Context) {
 			}
 
 			for nextArbHeight < height-ARB_USEFUL_BLOCK_NUM {
-				for {
-					select {
-					case <-ctx.Done():
-						return
-					default:
-					}
-					log.Infof("handling arb height:%d", nextArbHeight)
-					err = v.fetchLockDepositEvents(nextArbHeight)
-					if err != nil {
-						log.Warnf("fetchLockDepositEvents failed:%v", err)
-						sleep()
-						continue
-					}
-					nextArbHeight++
+				select {
+				case <-ctx.Done():
+					return
+				default:
 				}
+				log.Infof("handling arb height:%d", nextArbHeight)
+				err = v.fetchLockDepositEvents(nextArbHeight)
+				if err != nil {
+					log.Warnf("fetchLockDepositEvents failed:%v", err)
+					sleep()
+					continue
+				}
+				nextArbHeight++
 			}
 
 			err = v.bdb.UpdateArbHeight(nextArbHeight)
