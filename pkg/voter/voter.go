@@ -57,6 +57,10 @@ func New(polySdk *sdk.PolySdk, signer *sdk.Account, conf *config.Config) *Voter 
 
 func (v *Voter) init() (err error) {
 
+	if v.conf.ArbConfig.BlocksToWait > ARB_USEFUL_BLOCK_NUM {
+		ARB_USEFUL_BLOCK_NUM = v.conf.ArbConfig.BlocksToWait
+	}
+
 	var clients []*ethclient.Client
 	for _, node := range v.conf.ArbConfig.RestURL {
 		client, err := ethclient.Dial(node)
@@ -88,7 +92,7 @@ func (v *Voter) init() (err error) {
 	return
 }
 
-const ARB_USEFUL_BLOCK_NUM = 1
+var ARB_USEFUL_BLOCK_NUM = uint64(1)
 
 func (v *Voter) Start(ctx context.Context) {
 	err := v.init()
