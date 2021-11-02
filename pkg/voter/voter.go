@@ -22,6 +22,7 @@ package voter
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"math/big"
 	"math/rand"
 	"time"
@@ -36,6 +37,7 @@ import (
 	"github.com/polynetwork/eth-contracts/go_abi/eccm_abi"
 	sdk "github.com/polynetwork/poly-go-sdk"
 	"github.com/polynetwork/poly/common"
+	"github.com/polynetwork/poly/core/types"
 	common2 "github.com/polynetwork/poly/native/service/cross_chain_manager/common"
 	autils "github.com/polynetwork/poly/native/service/utils"
 )
@@ -200,15 +202,39 @@ func (v *Voter) fetchLockDepositEvents(height uint64) (err error) {
 			height:  height,
 		}
 
-		_, err = v.commitVote(uint32(height), crossTx.value, crossTx.txId)
+		var txHash string
+		txHash, err = v.commitVote(uint32(height), crossTx.value, crossTx.txId)
 		if err != nil {
 			log.Errorf("commitVote failed:%v", err)
+			return
+		}
+		err = v.waitTx(txHash)
+		if err != nil {
+			log.Errorf("waitTx failed:%v", err)
+			return
 		}
 	}
 
 	log.Infof("arb height %d empty: %v", height, empty)
 
 	return
+}
+
+func (v *Voter) waitTx(txHash string) (err error) {
+	start := time.Now()
+	var tx *types.Transaction
+	for {
+		tx, err = v.polySdk.GetTransaction(txHash)
+		if tx == nil || err != nil {
+			if time.Since(start) > time.Minute*5 {
+				err = fmt.Errorf("waitTx timeout")
+				return
+			}
+			time.Sleep(time.Second)
+			continue
+		}
+		return
+	}
 }
 
 func (v *Voter) commitVote(height uint32, value []byte, txhash []byte) (string, error) {
