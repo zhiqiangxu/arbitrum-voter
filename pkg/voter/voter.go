@@ -117,6 +117,7 @@ func (v *Voter) Start(ctx context.Context) {
 				continue
 			}
 			if height < nextArbHeight+ARB_USEFUL_BLOCK_NUM {
+				log.Infof("height(%d) < nextArbHeight(%d)+ARB_USEFUL_BLOCK_NUM(%d)", height, nextArbHeight, ARB_USEFUL_BLOCK_NUM)
 				continue
 			}
 
