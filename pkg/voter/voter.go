@@ -137,6 +137,7 @@ func (v *Voter) Start(ctx context.Context) {
 				nextArbHeight++
 			}
 
+			log.Infof("nextArbHeight arb height:%d", nextArbHeight)
 			err = v.bdb.UpdateArbHeight(nextArbHeight)
 			if err != nil {
 				log.Warnf("UpdateArbHeight failed:%v", err)
