@@ -212,7 +212,7 @@ func (v *Voter) fetchLockDepositEvents(height uint64) (err error) {
 		}
 		err = v.waitTx(txHash)
 		if err != nil {
-			log.Errorf("waitTx failed:%v", err)
+			log.Errorf("waitTx failed:%v txHash:%s", err,txHash)
 			return
 		}
 	}
